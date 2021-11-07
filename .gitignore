@@ -3,6 +3,12 @@
 *.ap_
 *.aab
 
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
 # Files for the ART/Dalvik VM
 *.dex
 
