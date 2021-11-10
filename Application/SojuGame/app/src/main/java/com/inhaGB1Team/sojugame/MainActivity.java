@@ -8,7 +8,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -27,6 +31,10 @@ public class MainActivity extends AppCompatActivity {
     ToggleButton tgBtn_Bluetooth;
     ToggleButton tgBtn_Connect;
 
+    Button btn_SendNum;
+
+    EditText et_PeopleNum;
+
     BluetoothAdapter mBluetoothAdapter;
     Set<BluetoothDevice> mPairedDevices;
     List<String> mListPairedDevices;
@@ -40,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     final static int BT_MESSAGE_READ = 2;
     final static int BT_CONNECTING_STATUS = 3;
 
+    //
     final static UUID BT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
     @Override
@@ -50,6 +59,10 @@ public class MainActivity extends AppCompatActivity {
         // 블루투스, 연결 버튼 정의
         tgBtn_Bluetooth = (ToggleButton) findViewById(R.id.tgbtn_Bluetooth);
         tgBtn_Connect = (ToggleButton) findViewById(R.id.tgbtn_Connect);
+
+        et_PeopleNum = (EditText) findViewById(R.id.et_Number);
+
+        btn_SendNum = (Button) findViewById(R.id.btn_SendNum);
 
         // 장치 블루투스 지원 여부 확인
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -82,6 +95,22 @@ public class MainActivity extends AppCompatActivity {
                     // Button Image Change
                 }
             }
+        });
+
+        et_PeopleNum.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.toString().length() > 0) {
+                    if (Integer.parseInt(s.toString()) > 24 | Integer.parseInt(s.toString()) < 1) {
+                        et_PeopleNum.setText(null);
+                        Toast.makeText(getApplicationContext(), "1부터 24까지만 입력해주세요", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable s) { }
         });
     }
 
