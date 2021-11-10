@@ -7,19 +7,31 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/btn_Bluetooth"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="BlueTooth"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="667dp" />
-
-    <Button
         android:id="@+id/btn_Main"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Main"
-        tools:layout_editor_absoluteX="161dp"
-        tools:layout_editor_absoluteY="341dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ToggleButton
+        android:id="@+id/tgbtn_Bluetooth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="BT"
+        app:layout_constraintBaseline_toBaselineOf="@+id/tgbtn_Connect"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ToggleButton
+        android:id="@+id/tgbtn_Connect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="CN"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tgbtn_Bluetooth" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
