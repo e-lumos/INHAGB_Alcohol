@@ -57,6 +57,11 @@ public class BlueToothActivity extends AppCompatActivity {
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
+        // 블루투스가 On되어 있으면, 스위치 바꿔줌
+        if (mBluetoothAdapter.isEnabled()) {
+            sch_OnOffBT.setChecked(true);
+        }
+
         sch_OnOffBT.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -80,13 +85,15 @@ public class BlueToothActivity extends AppCompatActivity {
         if (mBluetoothAdapter == null) {
             Toast.makeText(getApplicationContext(), "블루투스를 지원하지 않는 기기입니다.", Toast.LENGTH_LONG).show();
         } else {
-            // isEnabled()
+            Intent intentBluetoothAble = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(intentBluetoothAble, BT_REQUEST_ENABLE);
             if (mBluetoothAdapter.isEnabled()) {
-                Toast.makeText(getApplicationContext(), "블루투스가 이미 활성화 되었습니다.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "블루투스 활성화", Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(getApplicationContext(), "블루투스가 활성화 되어 있지 않습니다.", Toast.LENGTH_LONG).show();
-                Intent intentBluetoothAble = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(intentBluetoothAble, BT_REQUEST_ENABLE);
+                // Toast.makeText(getApplicationContext(), "블루투스가 활성화 되어 있지 않습니다.", Toast.LENGTH_LONG).show();
+                // Intent intentBluetoothAble = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                // startActivityForResult(intentBluetoothAble, BT_REQUEST_ENABLE);
+                // Toast.makeText(getApplicationContext(), "블루투스가 활성화되지 않음", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -97,7 +104,7 @@ public class BlueToothActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "블루투스가 비활성화 되었습니다.", Toast.LENGTH_SHORT).show();
         }
         else {
-            Toast.makeText(getApplicationContext(), "블루투스가 이미 비활성화 되어 있습니다.", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(getApplicationContext(), "블루투스가 이미 비활성화 되어 있습니다.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -108,7 +115,8 @@ public class BlueToothActivity extends AppCompatActivity {
                 if (resultCode == RESULT_OK) { // 블루투스 활성화를 확인을 클릭하였다면
                     Toast.makeText(getApplicationContext(), "블루투스 활성화", Toast.LENGTH_LONG).show();
                 } else if (resultCode == RESULT_CANCELED) { // 블루투스 활성화를 취소를 클릭하였다면
-                    Toast.makeText(getApplicationContext(), "취소", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "블루투스가 활성화되지 않음", Toast.LENGTH_LONG).show();
+                    sch_OnOffBT.setChecked(false);
                 }
                 break;
         }
