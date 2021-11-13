@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -111,6 +112,22 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override
             public void afterTextChanged(Editable s) { }
+        });
+
+        btn_SendNum.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (!tgBtn_Bluetooth.isChecked()){
+                    Toast.makeText(getApplicationContext(), "블루투스가 비활성화되어 있음", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if (!tgBtn_Connect.isChecked()){
+                    Toast.makeText(getApplicationContext(), "연결이 비활성화되어 있음", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                String msg = "AND_PNUM_" + et_PeopleNum.getText().toString();
+                mThreadConnectedBluetooth.write(msg);
+            }
         });
     }
 
