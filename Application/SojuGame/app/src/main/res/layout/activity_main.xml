@@ -8,57 +8,67 @@
 
     <Button
         android:id="@+id/btn_Main"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_marginTop="303dp"
+        android:layout_marginBottom="202dp"
         android:text="Main"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tgbtn_Connect"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ToggleButton
         android:id="@+id/tgbtn_Bluetooth"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:text="BT"
-        app:layout_constraintBaseline_toBaselineOf="@+id/tgbtn_Connect"
-        app:layout_constraintEnd_toStartOf="@+id/tgbtn_Connect"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="19dp"
+        android:layout_marginEnd="184dp"
+        android:background="@drawable/tgbtn_bluetooth"
+        android:textOff=""
+        android:textOn=""
+        app:layout_constraintBottom_toBottomOf="@+id/tgbtn_Connect"
+        app:layout_constraintEnd_toStartOf="@+id/et_Number"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tgbtn_Connect" />
 
     <ToggleButton
         android:id="@+id/tgbtn_Connect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="94dp"
-        android:layout_marginBottom="16dp"
-        android:text="CN"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/et_Number"
-        app:layout_constraintStart_toEndOf="@+id/tgbtn_Bluetooth" />
-
-    <EditText
-        android:id="@+id/et_Number"
-        android:layout_width="0dp"
-        android:layout_height="52dp"
-        android:layout_marginEnd="7dp"
-        android:layout_marginBottom="16dp"
-        android:ems="10"
-        android:inputType="number"
-        android:digits="0123456789"
-        android:text="4"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginEnd="163dp"
+        android:layout_marginBottom="34dp"
+        android:textOff=""
+        android:textOn=""
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_SendNum"
-        app:layout_constraintStart_toEndOf="@+id/tgbtn_Connect" />
+        app:layout_constraintStart_toEndOf="@+id/tgbtn_Bluetooth"
+        app:layout_constraintTop_toBottomOf="@+id/btn_Main" />
 
     <Button
         android:id="@+id/btn_SendNum"
-        android:layout_width="0dp"
-        android:layout_height="58dp"
+        android:layout_width="59dp"
+        android:layout_height="78dp"
         android:layout_marginEnd="16dp"
         android:text="명"
         app:layout_constraintBaseline_toBaselineOf="@+id/et_Number"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/et_Number" />
+        app:layout_constraintStart_toEndOf="@+id/tgbtn_Connect" />
+
+    <EditText
+        android:id="@+id/et_Number"
+        android:layout_width="93dp"
+        android:layout_height="53dp"
+        android:layout_marginEnd="77dp"
+        android:layout_marginBottom="14dp"
+        android:digits="0123456789"
+        android:ems="10"
+        android:inputType="number"
+        android:text="4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tgbtn_Bluetooth"
+        app:layout_constraintTop_toBottomOf="@+id/btn_Main"
+        app:layout_constraintVertical_bias="0.914" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
