@@ -131,6 +131,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        mThreadConnectedBluetooth.cancel();
+    }
+
     void bluetoothOn() {
         if(mBluetoothAdapter == null) {
             Toast.makeText(getApplicationContext(), "블루투스를 지원하지 않는 기기입니다.", Toast.LENGTH_LONG).show();
@@ -298,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 mmSocket.close();
             } catch (IOException e) {
-                Toast.makeText(getApplicationContext(), "소켓 해제 중 오류가 발생했습니다.", Toast.LENGTH_LONG).show();
+                // Toast.makeText(getApplicationContext(), "소켓 해제 중 오류가 발생했습니다.", Toast.LENGTH_LONG).show();
             }
         }
     }
