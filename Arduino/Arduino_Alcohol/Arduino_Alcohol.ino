@@ -1,4 +1,3 @@
-#include <AltSoftSerial.h>      // SoftSerial 동시 2개
 #include <DFPlayer_Mini_Mp3.h>  // MP3 제어 라이브러리 
 #include <Adafruit_NeoPixel.h>  // LED 제어 라이브러리
 #include <SoftwareSerial.h>     // RX TX 2개 사용
@@ -9,7 +8,7 @@
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
-SoftwareSerial btSerial(0, 1);    // 블루투스 모듈 RX TX
+// SoftwareSerial btSerial(0, 1);    // 블루투스 모듈 RX TX
 SoftwareSerial musicModule(2, 3); // MP3 모듈 RX TX
 
 int fsrSensor = A0;     // 압력센서 아날로그입력 핀번호
@@ -18,14 +17,18 @@ int fsrValue = 0;       // 압력센서 값 저장
 byte buffer[1024];      // 데이터 저장 버퍼
 int bufferIndex;
 
-void init();            // 변수 초기화 함수
+String btMessage;
+
+void initVar();         // 변수 초기화 함수
 void colorSetting();    // LED 동작 제어
 void btControl();       // 블루투스 통신 제어
+void btProtocol();      // 안드로이드에 전송할 데이터 전처리
+void sendByte(String);  // String 형식의 데이터 inputStream 형식인 Byte로 전송
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  btSerial.begin(9600);
+  // btSerial.begin(9600);
   musicModule.begin(9600);
 
   bufferIndex = 0;                  // 버퍼 위치 초기화
@@ -41,14 +44,16 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  init();
+  initVar();
   
   fsrValue = analogRead(fsrSensor);
-
+  btProtocol();
+  sendByte(btMessage);  
 }
 
-void init(){
+void initVar(){
   fsrValue = 0;
+  btMessage = "";
 }
 
 void colorSetting(){
@@ -56,14 +61,33 @@ void colorSetting(){
 }
 
 void btControl(){
-  byte data = btSerial.read();
-  Serial.write(data);
-  buffer[bufferIndex++] = data;
+  byte data = Serial.read();
+  // Serial.write(data);
 
-  if (data == '\n'){
-    buffer[bufferIndex] = '\0';
-
-    btSerial.write(buffer, bufferIndex);
-    bufferIndex = 0;
+  while (true){
+    buffer[bufferIndex++] = data;
+  
+    if (data == '\n'){
+      buffer[bufferIndex] = '\0';
+  
+      Serial.write(buffer, bufferIndex);
+      bufferIndex = 0;
+    }
   }
+}
+
+void btProtocol(){
+  btMessage = "ARD_FSR_" + String(fsrValue);
+}
+
+void sendByte(String inputString){
+  byte *tmp = new byte[inputString.length() + 1];
+  inputString.getBytes(tmp, inputString.length() + 1);
+
+  for(int i = 0; i < inputString.length(); i++){
+    Serial.print(*(tmp + i));
+  }
+
+  Serial.print("\n");
+  free(tmp);
 }
