@@ -8,11 +8,12 @@
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
-// SoftwareSerial btSerial(0, 1);    // 블루투스 모듈 RX TX
+// SoftwareSerial btSerial(0, 1); // 블루투스 모듈 RX TX
+// 하드웨어 시리얼 0, 1 핀 Bluetooth로 사
 SoftwareSerial musicModule(2, 3); // MP3 모듈 RX TX
 
 int fsrSensor = A0;     // 압력센서 아날로그입력 핀번호
-int fsrValue = 0;       // 압력센서 값 저장 
+int fsrValue = 0;       // 압력센서 값 저장 용
 
 byte buffer[1024];      // 데이터 저장 버퍼
 int bufferIndex;
@@ -51,35 +52,42 @@ void loop() {
   sendByte(btMessage);  
 }
 
+// 변수 초기화
 void initVar(){
   fsrValue = 0;
   btMessage = "";
 }
 
+// LED 패턴 관리
 void colorSetting(){
   
 }
 
+// Bluetooth 데이터 들어오면 읽어들임 
 void btControl(){
-  byte data = Serial.read();
-  // Serial.write(data);
-
-  while (true){
-    buffer[bufferIndex++] = data;
+  if (Serial.available()){
+    byte data = Serial.read();
+    // Serial.write(data);
   
-    if (data == '\n'){
-      buffer[bufferIndex] = '\0';
-  
-      Serial.write(buffer, bufferIndex);
-      bufferIndex = 0;
+    while (true){
+      buffer[bufferIndex++] = data;
+    
+      if (data == '\n'){
+        buffer[bufferIndex] = '\0';
+    
+        Serial.write(buffer, bufferIndex);
+        bufferIndex = 0;
+      }
     }
   }
 }
 
+// Bluetooth로 전하는 메세지 프로토콜 
 void btProtocol(){
   btMessage = "ARD_FSR_" + String(fsrValue);
 }
 
+// String 형식의 데이터 Byte로 전송 
 void sendByte(String inputString){
   byte *tmp = new byte[inputString.length() + 1];
   inputString.getBytes(tmp, inputString.length() + 1);
