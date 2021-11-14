@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     ToggleButton tgBtn_Connect;
 
     Button btn_SendNum;
+    Button btn_Main;
 
     EditText et_PeopleNum;
 
@@ -49,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
     final static int BT_MESSAGE_READ = 2;
     final static int BT_CONNECTING_STATUS = 3;
 
+    int fsrValue = 0;   // 압력 센서 데이터
+
     //
     final static UUID BT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
@@ -64,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         et_PeopleNum = (EditText) findViewById(R.id.et_Number);
 
         btn_SendNum = (Button) findViewById(R.id.btn_SendNum);
+        btn_Main = (Button) findViewById(R.id.btn_Main);
 
         // 장치 블루투스 지원 여부 확인
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -126,6 +130,22 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 String msg = "AND_PNUM_" + et_PeopleNum.getText().toString();
+                mThreadConnectedBluetooth.write(msg);
+            }
+        });
+
+        btn_Main.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!tgBtn_Bluetooth.isChecked()){
+                    Toast.makeText(getApplicationContext(), "블루투스가 비활성화되어 있음", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if (!tgBtn_Connect.isChecked()) {
+                    Toast.makeText(getApplicationContext(), "연결이 비활성화되어 있음", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                String msg = "AND_MAIN_START";
                 mThreadConnectedBluetooth.write(msg);
             }
         });
@@ -239,6 +259,7 @@ public class MainActivity extends AppCompatActivity {
             mBluetoothSocket.connect();
             mThreadConnectedBluetooth = new ConnectedBluetoothThread(mBluetoothSocket);
             mThreadConnectedBluetooth.start();
+            mThreadConnectedBluetooth.run();
             mBluetoothHandler.obtainMessage(BT_CONNECTING_STATUS, 1, -1).sendToTarget();
         } catch (IOException e) {
             Toast.makeText(getApplicationContext(), "블루투스 연결 중 오류가 발생했습니다.", Toast.LENGTH_LONG).show();
@@ -271,6 +292,7 @@ public class MainActivity extends AppCompatActivity {
         // 수신받은 데이터는 언제들어올 지 모르니 항상 확인
         public void run() {
             byte[] buffer = new byte[1024];
+            // String buffer = "";
             int bytes;
 
             // 처리된 데이터가 존재하면 데이터를 읽어오는 작업
@@ -282,6 +304,7 @@ public class MainActivity extends AppCompatActivity {
                         bytes = mmInStream.available();
                         bytes = mmInStream.read(buffer, 0, bytes);
                         mBluetoothHandler.obtainMessage(BT_MESSAGE_READ, bytes, -1, buffer).sendToTarget();
+                        // Buffer 처리 함수 추가
                     }
                 } catch (IOException e) {
                     break;
@@ -307,5 +330,9 @@ public class MainActivity extends AppCompatActivity {
                 // Toast.makeText(getApplicationContext(), "소켓 해제 중 오류가 발생했습니다.", Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    public void readBuffer(){
+
     }
 }
