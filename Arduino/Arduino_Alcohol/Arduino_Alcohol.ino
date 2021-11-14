@@ -1,3 +1,4 @@
+#include <AltSoftSerial.h>      // SoftSerial 동시 2개
 #include <DFPlayer_Mini_Mp3.h>  // MP3 제어 라이브러리 
 #include <Adafruit_NeoPixel.h>  // LED 제어 라이브러리
 #include <SoftwareSerial.h>     // RX TX 2개 사용
