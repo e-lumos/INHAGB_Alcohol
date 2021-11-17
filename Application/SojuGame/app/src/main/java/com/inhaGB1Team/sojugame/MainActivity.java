@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
                 if (isChecked) {
                     listPairedDevices();
                 } else {
+                    mThreadConnectedBluetooth.cancel();
                     // Button Image Change
                 }
             }
@@ -107,6 +108,17 @@ public class MainActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                /*
+                if (s.toString().length() > 0) {
+                    if (Integer.parseInt(s.toString()) > 24 | Integer.parseInt(s.toString()) < 1) {
+                        et_PeopleNum.setText(null);
+                        Toast.makeText(getApplicationContext(), "1부터 24까지만 입력해주세요", Toast.LENGTH_LONG).show();
+                    }
+                }
+                */
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
                 if (s.toString().length() > 0) {
                     if (Integer.parseInt(s.toString()) > 24 | Integer.parseInt(s.toString()) < 1) {
                         et_PeopleNum.setText(null);
@@ -114,8 +126,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-            @Override
-            public void afterTextChanged(Editable s) { }
         });
 
         btn_SendNum.setOnClickListener(new View.OnClickListener(){
