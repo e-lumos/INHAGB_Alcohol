@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "연결이 비활성화되어 있음", Toast.LENGTH_LONG).show();
                     return;
                 }
-                String msg = "AND_PNUM_" + et_PeopleNum.getText().toString();
+                String msg = "AND_PNUM_" + et_PeopleNum.getText().toString() + "\n";
                 mThreadConnectedBluetooth.write(msg);
             }
         });
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "연결이 비활성화되어 있음", Toast.LENGTH_LONG).show();
                     return;
                 }
-                String msg = "AND_MAIN_START";
+                String msg = "AND_MAIN_START\n";
                 mThreadConnectedBluetooth.write(msg);
             }
         });
@@ -259,8 +259,7 @@ public class MainActivity extends AppCompatActivity {
             mBluetoothSocket.connect();
             mThreadConnectedBluetooth = new ConnectedBluetoothThread(mBluetoothSocket);
             mThreadConnectedBluetooth.start();
-            mThreadConnectedBluetooth.run();
-            mBluetoothHandler.obtainMessage(BT_CONNECTING_STATUS, 1, -1).sendToTarget();
+            // mBluetoothHandler.obtainMessage(BT_CONNECTING_STATUS, 1, -1).sendToTarget();
         } catch (IOException e) {
             Toast.makeText(getApplicationContext(), "블루투스 연결 중 오류가 발생했습니다.", Toast.LENGTH_LONG).show();
         }

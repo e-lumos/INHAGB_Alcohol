@@ -6,10 +6,11 @@
 #define NUMPIXELS 24    // LED 소자 개수
 #define BRIGHTNESS 180  // 밝기 0 ~ 255
 
+// NeoPixel 초기화 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 // SoftwareSerial btSerial(0, 1); // 블루투스 모듈 RX TX
-// 하드웨어 시리얼 0, 1 핀 Bluetooth로 사
+// 하드웨어 시리얼 0, 1 핀 Bluetooth로 사용 
 SoftwareSerial musicModule(2, 3); // MP3 모듈 RX TX
 
 int fsrSensor = A0;     // 압력센서 아날로그입력 핀번호
@@ -18,7 +19,7 @@ int fsrValue = 0;       // 압력센서 값 저장 용
 byte buffer[1024];      // 데이터 저장 버퍼
 int bufferIndex;
 
-String btMessage;
+String btMessage;       // 전송될 메세지
 
 void initVar();         // 변수 초기화 함수
 void colorSetting();    // LED 동작 제어
@@ -46,6 +47,7 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   initVar();
+  btControl();
   
   fsrValue = analogRead(fsrSensor);
   btProtocol();
@@ -75,14 +77,14 @@ void btControl(){
       if (data == '\n'){
         buffer[bufferIndex] = '\0';
     
-        Serial.write(buffer, bufferIndex);
+        // Serial.write(buffer, bufferIndex);
         bufferIndex = 0;
       }
     }
   }
 }
 
-// Bluetooth로 전하는 메세지 프로토콜 
+// Bluetooth로 전송하는 메세지 프로토콜 
 void btProtocol(){
   btMessage = "ARD_FSR_" + String(fsrValue);
 }
