@@ -4,71 +4,73 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/main"
     tools:context=".MainActivity">
 
     <Button
         android:id="@+id/btn_Main"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
-        android:layout_marginTop="303dp"
-        android:layout_marginBottom="202dp"
-        android:text="Main"
-        app:layout_constraintBottom_toTopOf="@+id/tgbtn_Connect"
+        android:layout_width="256dp"
+        android:layout_height="256dp"
+        android:layout_marginStart="52dp"
+        android:layout_marginTop="250dp"
+        android:layout_marginEnd="52dp"
+        android:foreground="@drawable/btn_main"
+        android:background="@drawable/bt_main"
+        android:text=""
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <ToggleButton
         android:id="@+id/tgbtn_Bluetooth"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_marginStart="19dp"
-        android:layout_marginEnd="184dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="630dp"
         android:background="@drawable/tgbtn_bluetooth"
         android:textOff=""
         android:textOn=""
-        app:layout_constraintBottom_toBottomOf="@+id/tgbtn_Connect"
-        app:layout_constraintEnd_toStartOf="@+id/et_Number"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tgbtn_Connect" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ToggleButton
         android:id="@+id/tgbtn_Connect"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_marginEnd="163dp"
-        android:layout_marginBottom="34dp"
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="630dp"
+        android:background="@drawable/tgbtn_connect"
         android:textOff=""
         android:textOn=""
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btn_SendNum"
-        app:layout_constraintStart_toEndOf="@+id/tgbtn_Bluetooth"
-        app:layout_constraintTop_toBottomOf="@+id/btn_Main" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/btn_SendNum"
-        android:layout_width="59dp"
-        android:layout_height="78dp"
+        android:layout_width="69dp"
+        android:layout_height="61dp"
+        android:layout_marginTop="630dp"
         android:layout_marginEnd="16dp"
+        android:foreground="@color/button"
+        android:foregroundTint="@color/button"
         android:text="명"
-        app:layout_constraintBaseline_toBaselineOf="@+id/et_Number"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/tgbtn_Connect" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/et_Number"
-        android:layout_width="93dp"
-        android:layout_height="53dp"
-        android:layout_marginEnd="77dp"
-        android:layout_marginBottom="14dp"
+        android:layout_width="78dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="640dp"
+        android:layout_marginEnd="11dp"
         android:digits="0123456789"
         android:ems="10"
         android:inputType="number"
-        android:text="4"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/tgbtn_Bluetooth"
-        app:layout_constraintTop_toBottomOf="@+id/btn_Main"
-        app:layout_constraintVertical_bias="0.914" />
+        android:text="1"
+        android:textColor="@color/black"
+        android:textAlignment="viewEnd"
+        app:layout_constraintEnd_toStartOf="@+id/btn_SendNum"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

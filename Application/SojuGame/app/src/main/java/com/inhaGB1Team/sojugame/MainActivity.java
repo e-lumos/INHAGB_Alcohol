@@ -7,13 +7,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -42,15 +43,27 @@ public class MainActivity extends AppCompatActivity {
     List<String> mListPairedDevices;
 
     Handler mBluetoothHandler;
-    ConnectedBluetoothThread mThreadConnectedBluetooth;
+    // ConnectedBluetoothThread mThreadConnectedBluetooth;
     BluetoothDevice mBluetoothDevice;
     BluetoothSocket mBluetoothSocket;
+
+    Thread workerThread = null;
+    private TextView textViewReceive;
 
     final static int BT_REQUEST_ENABLE = 1;
     final static int BT_MESSAGE_READ = 2;
     final static int BT_CONNECTING_STATUS = 3;
+    static final int REQUEST_ENABLE_BT = 10;
+
 
     int fsrValue = 0;   // 압력 센서 데이터
+    int readBufferPosition;
+
+    String mStrDelimiter = "\n";
+    char mCharDelimiter =  '\n';
+
+    private OutputStream mOutputStream = null; // 블루투스에 데이터를 출력하기 위한 출력 스트림
+    private InputStream mInputStream = null; // 블루투스에 데이터를 입력하기 위한 입력 스트림
 
     //
     final static UUID BT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
@@ -71,6 +84,9 @@ public class MainActivity extends AppCompatActivity {
 
         // 장치 블루투스 지원 여부 확인
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        //Test
+        // textViewReceive = (TextView) findViewById(R.id.textViewReceive);
 
         // 블루투스가 켜져 있으면 Toggle Button 상태 바꾸기
         if (mBluetoothAdapter.isEnabled()) {
@@ -97,7 +113,15 @@ public class MainActivity extends AppCompatActivity {
                 if (isChecked) {
                     listPairedDevices();
                 } else {
-                    mThreadConnectedBluetooth.cancel();
+                    // mThreadConnectedBluetooth.cancel();
+                    try {
+                        tgBtn_Connect.setChecked(false);
+                        mInputStream.close();
+                        mOutputStream.close();
+                        mBluetoothSocket.close();
+                    } catch (IOException e) {
+                        // Toast.makeText(getApplicationContext(), "소켓 해제 중 오류가 발생했습니다.", Toast.LENGTH_LONG).show();
+                    }
                     // Button Image Change
                 }
             }
@@ -108,24 +132,17 @@ public class MainActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                /*
+
                 if (s.toString().length() > 0) {
                     if (Integer.parseInt(s.toString()) > 24 | Integer.parseInt(s.toString()) < 1) {
                         et_PeopleNum.setText(null);
                         Toast.makeText(getApplicationContext(), "1부터 24까지만 입력해주세요", Toast.LENGTH_LONG).show();
                     }
                 }
-                */
+
             }
             @Override
-            public void afterTextChanged(Editable s) {
-                if (s.toString().length() > 0) {
-                    if (Integer.parseInt(s.toString()) > 24 | Integer.parseInt(s.toString()) < 1) {
-                        et_PeopleNum.setText(null);
-                        Toast.makeText(getApplicationContext(), "1부터 24까지만 입력해주세요", Toast.LENGTH_LONG).show();
-                    }
-                }
-            }
+            public void afterTextChanged(Editable s) { }
         });
 
         btn_SendNum.setOnClickListener(new View.OnClickListener(){
@@ -139,8 +156,13 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "연결이 비활성화되어 있음", Toast.LENGTH_LONG).show();
                     return;
                 }
-                String msg = "AND_PNUM_" + et_PeopleNum.getText().toString() + "\n";
-                mThreadConnectedBluetooth.write(msg);
+                String msg = "AND_PNUM_" + et_PeopleNum.getText().toString() + mStrDelimiter;
+                try{
+                    mOutputStream.write(msg.getBytes());
+                } catch (IOException e){
+                    Toast.makeText(getApplicationContext(), "데이터 전송중 오류가 발생", Toast.LENGTH_LONG).show();
+                }
+                // mThreadConnectedBluetooth.write(msg);
             }
         });
 
@@ -155,16 +177,28 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "연결이 비활성화되어 있음", Toast.LENGTH_LONG).show();
                     return;
                 }
-                String msg = "AND_MAIN_START\n";
-                mThreadConnectedBluetooth.write(msg);
+                String msg = "AND_MAIN_START" + mStrDelimiter;
+                try {
+                    mOutputStream.write(msg.getBytes());
+                } catch (IOException e){
+                    Toast.makeText(getApplicationContext(), "데이터 전송중 오류가 발생", Toast.LENGTH_LONG).show();
+                }
+                // mThreadConnectedBluetooth.write(msg);
             }
         });
     }
 
     @Override
     public void onDestroy(){
+        try{
+            workerThread.interrupt(); // 데이터 수신 쓰레드 종료
+            mInputStream.close();
+            mOutputStream.close();
+            mBluetoothSocket.close();
+        }catch(Exception e){}
+
         super.onDestroy();
-        mThreadConnectedBluetooth.cancel();
+        // mThreadConnectedBluetooth.cancel();
     }
 
     void bluetoothOn() {
@@ -267,14 +301,23 @@ public class MainActivity extends AppCompatActivity {
         try {
             mBluetoothSocket = mBluetoothDevice.createRfcommSocketToServiceRecord(BT_UUID);
             mBluetoothSocket.connect();
-            mThreadConnectedBluetooth = new ConnectedBluetoothThread(mBluetoothSocket);
-            mThreadConnectedBluetooth.start();
+
+            mOutputStream = mBluetoothSocket.getOutputStream();
+            mInputStream = mBluetoothSocket.getInputStream();
+
+            receiveData();
+
+            // mThreadConnectedBluetooth = new ConnectedBluetoothThread(mBluetoothSocket);
+            // mThreadConnectedBluetooth.start();
             // mBluetoothHandler.obtainMessage(BT_CONNECTING_STATUS, 1, -1).sendToTarget();
+
         } catch (IOException e) {
             Toast.makeText(getApplicationContext(), "블루투스 연결 중 오류가 발생했습니다.", Toast.LENGTH_LONG).show();
         }
+
     }
 
+    /*
     // 쓰레드 시작 - 쓰레드에서 사용할 전역 객체들을 선언
     private class ConnectedBluetoothThread extends Thread {
         private final BluetoothSocket mmSocket;
@@ -299,11 +342,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // 수신받은 데이터는 언제들어올 지 모르니 항상 확인
+
+        /*
         public void run() {
             byte[] buffer = new byte[1024];
-            // String buffer = "";
+            String str = "";
             int bytes;
-
             // 처리된 데이터가 존재하면 데이터를 읽어오는 작업
             while (true) {
                 try {
@@ -312,14 +356,19 @@ public class MainActivity extends AppCompatActivity {
                         SystemClock.sleep(100);
                         bytes = mmInStream.available();
                         bytes = mmInStream.read(buffer, 0, bytes);
-                        mBluetoothHandler.obtainMessage(BT_MESSAGE_READ, bytes, -1, buffer).sendToTarget();
+                        str += bytes;
                         // Buffer 처리 함수 추가
                     }
+                    // str += bytes;
                 } catch (IOException e) {
                     break;
                 }
             }
+            Log.d("test", str);
         }
+
+        // 데이터 수신을 위한 메소드
+
 
         // 데이터 전송을 위한 메소드
         public void write(String str) {
@@ -334,11 +383,69 @@ public class MainActivity extends AppCompatActivity {
         // 블루투스 소켓을 닫는 메소드
         public void cancel() {
             try {
+                mmInStream.close();
+                mmOutStream.close();
                 mmSocket.close();
             } catch (IOException e) {
                 // Toast.makeText(getApplicationContext(), "소켓 해제 중 오류가 발생했습니다.", Toast.LENGTH_LONG).show();
             }
         }
+    }
+    */
+
+    public void receiveData() {
+        final Handler handler = new Handler();
+        Log.d("test", "start");
+        // 데이터를 수신하기 위한 버퍼를 생성
+        readBufferPosition = 0;
+        byte[] readBuffer = new byte[1024];
+        // 데이터를 수신하기 위한 쓰레드 생성
+        workerThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(Thread.currentThread().isInterrupted()) {
+                    Log.d("test", "main");
+                    try {
+                        // 데이터를 수신했는지 확인합니다.
+                        int byteAvailable = mInputStream.available();
+                        // 데이터가 수신 된 경우
+                        if(byteAvailable > 0) {
+                            // 입력 스트림에서 바이트 단위로 읽어 옵니다.
+                            byte[] bytes = new byte[byteAvailable];
+                            mInputStream.read(bytes);
+                            // 입력 스트림 바이트를 한 바이트씩 읽어 옵니다.
+                            for(int i = 0; i < byteAvailable; i++) {
+                                byte tempByte = bytes[i];
+                                // 개행문자를 기준으로 받음(한줄)
+                                if(tempByte == '\n') {
+                                    // readBuffer 배열을 encodedBytes로 복사
+                                    byte[] encodedBytes = new byte[readBufferPosition];
+                                    System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
+                                    // 인코딩 된 바이트 배열을 문자열로 변환
+                                    final String text = new String(encodedBytes, "US-ASCII");
+                                    readBufferPosition = 0;
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            // 텍스트 뷰에 출력
+                                            textViewReceive.setText(text + mStrDelimiter);
+                                            // Log.d("test", text);
+                                        }
+                                    });
+                                } // 개행 문자가 아닐 경우
+                                else {
+                                    readBuffer[readBufferPosition++] = tempByte;
+                                }
+                            }
+                        }
+                    } catch (IOException e) {
+                        finish();
+                    }
+                }
+            }
+        });
+        Log.d("test", "ready");
+        workerThread.start();
     }
 
     public void readBuffer(){
