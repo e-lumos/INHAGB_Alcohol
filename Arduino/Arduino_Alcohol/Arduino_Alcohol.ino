@@ -59,7 +59,7 @@ void loop() {
   btControl();
   
   fsrValue = analogRead(fsrSensor);
-  if (fsrValue >= 100 && ifCup == false){
+  if (fsrValue >= 50 && ifCup == false){
     for(int i = 0; i < 24; i++){
       strip.setPixelColor(i, 255, 0, 0);
       strip.show();
